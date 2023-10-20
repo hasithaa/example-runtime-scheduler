@@ -1,0 +1,15 @@
+[package]
+org = "hasitha"
+name = "ballerina"
+version = "0.1.0"
+distribution = "2201.8.1"
+
+[build-options]
+observabilityIncluded = true
+
+
+[[platform.java17.dependency]]
+groupId = "io.ballerina.stdlib"
+artifactId = "xmldata-native"
+version = "2.4.1"
+path = "../lib/build/libs/lib.jar"
