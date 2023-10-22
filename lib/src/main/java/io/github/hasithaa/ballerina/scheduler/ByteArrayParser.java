@@ -3,13 +3,13 @@ package io.github.hasithaa.ballerina.scheduler;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class Parser {
+public class ByteArrayParser {
 
     private InputStream inputStream;
     StringBuilder resultBuilder = new StringBuilder();
     int result = 0;
 
-    Parser(InputStream inputStream) {
+    ByteArrayParser(InputStream inputStream) {
         this.inputStream = inputStream;
     }
 
@@ -24,10 +24,6 @@ public class Parser {
             resultBuilder.append(c);
             System.out.println(">" +  c);
         }
-    }
-
-    void parseWithConsumer() {
-        // TODO: Implement this method
     }
 
     public String getResultString() {
