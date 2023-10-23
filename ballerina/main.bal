@@ -10,9 +10,11 @@ public function main() returns error? {
     check runInefficientByteArrayStream(byteArray, int);
 
     // Create Stream 1
-    stream<byte[], error?> byteStream = new (new CustomByteSteam(byteArray));
-    check runEfficientByteArrayStream(byteStream, string);
-    check runEfficientByteArrayStream(byteStream, int);
+    io:println("--- Create Stream  ---");
+    stream<byte[], error?> byteStream1 = new (new CustomByteSteam(byteArray));
+    check runEfficientByteArrayStream(byteStream1, string);
+    stream<byte[], error?> byteStream2 = new (new CustomByteSteam(byteArray));
+    check runEfficientByteArrayStream(byteStream2, int);
 }
 
 function runInefficientByteArrayStream(byte[] byteArray, typedesc<int|string> T) returns error? {
