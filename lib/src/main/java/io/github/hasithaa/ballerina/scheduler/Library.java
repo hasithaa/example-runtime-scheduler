@@ -4,7 +4,10 @@ import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.TypeTags;
 import io.ballerina.runtime.api.creators.ErrorCreator;
+import io.ballerina.runtime.api.types.MethodType;
+import io.ballerina.runtime.api.types.ObjectType;
 import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.*;
 
 public class Library {
@@ -27,8 +30,7 @@ public class Library {
         final BObject iteratorObj = stream.getIteratorObj();
         Future future = env.markAsync();
 
-        try (ByteBlockBuilder byteBlockSteam = new ByteBlockBuilder(env, iteratorObj,
-                BallerinaByteStream.resolveNextMethod(iteratorObj))) {
+        try (ByteBlockBuilder byteBlockSteam = new ByteBlockBuilder(env, iteratorObj, resolveNextMethod(iteratorObj))) {
             ByteBlockConsumer<Object> transformer = new ByteBlockConsumer<>(future, typedesc);
             byteBlockSteam.readAllBlocksAncConsumer(transformer);
         } catch (Exception e) {
@@ -36,6 +38,18 @@ public class Library {
                     StringUtils.fromString("Error occurred while reading the stream: " + e.getMessage()));
         }
         return null;
+    }
+
+    static MethodType resolveNextMethod(BObject iterator) {
+        ObjectType objectType = (ObjectType) TypeUtils.getReferredType(iterator.getType());
+        MethodType[] methods = objectType.getMethods();
+        // Assumes compile-time validation of the iterator object
+        for (MethodType method : methods) {
+            if (method.getName().equals("next")) {
+                return method;
+            }
+        }
+        throw new IllegalStateException("next method not found in the iterator object");
     }
 
 }
