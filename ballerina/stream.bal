@@ -1,5 +1,7 @@
 import ballerina/io;
 
+const BUFFER_SIZE = 40;
+
 class CustomByteSteam {
 
     final byte[] data;
@@ -16,7 +18,7 @@ class CustomByteSteam {
         }
         byte[] data = [];
         int i = 0;
-        while i < 4 && self.data.length() >= self.counter + 1 {
+        while i < BUFFER_SIZE && self.data.length() >= self.counter + 1 {
             data.push(self.data[self.counter]);
             self.counter = self.counter + 1;
             i = i + 1;

@@ -58,10 +58,11 @@ public class ByteBlockBuilder implements Closeable {
                 System.out.println("Reading a chunk");
                 if (o == null) {
                     InputStream inputStream = new ByteBlockStream(chunks);
-                    ByteArrayParser parser = new ByteArrayParser(inputStream);
+                    Parser parser;
                     try {
+                        parser = new BytesToXmlParser(inputStream);
                         parser.parse();
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         BError error = ErrorCreator.createError(StringUtils.fromString("Cannot read the stream"));
                         futureResultConsumer.accept(error);
                         return;

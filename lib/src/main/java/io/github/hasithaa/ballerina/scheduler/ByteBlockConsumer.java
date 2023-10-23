@@ -22,8 +22,8 @@ class ByteBlockConsumer<T> implements Consumer<T> {
     public void accept(Object value) {
         if (value instanceof BError) {
             future.complete(value);
-        } else if (value instanceof ByteArrayParser) {
-            ByteArrayParser parser = (ByteArrayParser) value;
+        } else if (value instanceof Parser) {
+            Parser parser = (Parser) value;
             if (typedesc.getDescribingType().getTag() == TypeTags.STRING_TAG) {
                 future.complete(StringUtils.fromString(parser.getResultString()));
             } else {

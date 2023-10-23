@@ -3,18 +3,22 @@ import ballerina/jballerina.java;
 
 public function main() returns error? {
 
-    final byte[] byteArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    xml x = xml `<web>
+                    <name>Ballerina Tips</name>
+                    <url>https://bal.tips</url>
+                    <author>Hasitha Aravinda</author>
+                    <year>2022</year>
+                </web>`;
+
+    final byte[] byteArray = x.toString().toBytes();
 
     // Inefficient Byte Array
     check runInefficientByteArrayStream(byteArray, string);
-    check runInefficientByteArrayStream(byteArray, int);
 
     // Create Stream 1
     io:println("--- Create Stream  ---");
     stream<byte[], error?> byteStream1 = new (new CustomByteSteam(byteArray));
     check runEfficientByteArrayStream(byteStream1, string);
-    stream<byte[], error?> byteStream2 = new (new CustomByteSteam(byteArray));
-    check runEfficientByteArrayStream(byteStream2, int);
 }
 
 function runInefficientByteArrayStream(byte[] byteArray, typedesc<int|string> T) returns error? {
