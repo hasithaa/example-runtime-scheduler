@@ -33,7 +33,7 @@ public class Library {
         final BObject iteratorObj = stream.getIteratorObj();
         Future future = env.markAsync();
 
-        try (ByteBlockBuilder byteBlockSteam = new ByteBlockBuilder(env, iteratorObj, resolveNextMethod(iteratorObj))) {
+        try (ByteBlockBuilder byteBlockSteam = new ByteBlockBuilder(env, iteratorObj, BallerinaByteStream.resolveNextMethod(iteratorObj))) {
             ByteBlockConsumer<Object> transformer = new ByteBlockConsumer<>(future, typedesc);
             byteBlockSteam.readAllBlocksAncConsumer(transformer);
         } catch (Exception e) {
@@ -43,16 +43,5 @@ public class Library {
         return null;
     }
 
-    private static MethodType resolveNextMethod(BObject iterator) {
-        ObjectType objectType = (ObjectType) TypeUtils.getReferredType(iterator.getType());
-        MethodType[] methods = objectType.getMethods();
-        // Assumes compile-time validation of the iterator object
-        for (MethodType method : methods) {
-            if (method.getName().equals("next")) {
-                return method;
-            }
-        }
-        throw new IllegalStateException("next method not found in the iterator object");
-    }
 
 }

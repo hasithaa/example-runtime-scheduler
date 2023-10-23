@@ -2,6 +2,7 @@ package io.github.hasithaa.ballerina.scheduler;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,8 +12,10 @@ import java.util.function.Consumer;
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.async.Callback;
 import io.ballerina.runtime.api.async.StrandMetadata;
+import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.types.MethodType;
 import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
@@ -54,7 +57,16 @@ public class ByteBlockBuilder implements Closeable {
             public void notifySuccess(Object o) {
                 System.out.println("Reading a chunk");
                 if (o == null) {
-                    futureResultConsumer.accept(new ByteBlockSteam(chunks));
+                    InputStream inputStream = new ByteBlockStream(chunks);
+                    ByteArrayParser parser = new ByteArrayParser(inputStream);
+                    try {
+                        parser.parse();
+                    } catch (IOException e) {
+                        BError error = ErrorCreator.createError(StringUtils.fromString("Cannot read the stream"));
+                        futureResultConsumer.accept(error);
+                        return;
+                    }
+                    futureResultConsumer.accept(parser);
                     return;
                 }
                 if (o instanceof BMap) {

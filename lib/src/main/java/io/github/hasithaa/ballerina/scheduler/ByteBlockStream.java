@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-public class ByteBlockSteam extends InputStream {
+public class ByteBlockStream extends InputStream {
 
     private final List<byte[]> chunks;
 
     private byte[] currentChunk = new byte[0];
     private int nextChunkIndex = 0;
 
-    ByteBlockSteam(List<byte[]> chunks) {
+    ByteBlockStream(List<byte[]> chunks) {
         this.chunks = chunks;
     }
 

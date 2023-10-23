@@ -3,6 +3,8 @@ package io.github.hasithaa.ballerina.scheduler;
 import java.io.IOException;
 import java.io.InputStream;
 
+// This implementation is fixed and simplified logic of the original implementation
+// We can't change this.
 public class ByteArrayParser {
 
     private InputStream inputStream;
