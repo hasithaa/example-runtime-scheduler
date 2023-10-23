@@ -12,7 +12,7 @@ class CustomByteSteam {
     }
 
     public isolated function next() returns record {|byte[] value;|}|error? {
-        io:println("next from Ballerina");
+        io:println("Read Buffer from Ballerina");
         if self.data.length() < self.counter + 1 {
             return ();
         }

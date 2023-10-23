@@ -55,8 +55,8 @@ public class ByteBlockBuilder implements Closeable {
         Callback callback = new Callback() {
             @Override
             public void notifySuccess(Object o) {
-                System.out.println("Reading a chunk");
                 if (o == null) {
+                    System.out.println("Reading Done");
                     InputStream inputStream = new ByteBlockStream(chunks);
                     Parser parser;
                     try {
@@ -70,6 +70,7 @@ public class ByteBlockBuilder implements Closeable {
                     futureResultConsumer.accept(parser);
                     return;
                 }
+                System.out.println("Reading a chunk");
                 if (o instanceof BMap) {
                     BMap<BString, Object> valueRecord = (BMap<BString, Object>) o;
                     final BString value = Arrays.stream(valueRecord.getKeys()).findFirst().get();
@@ -84,7 +85,6 @@ public class ByteBlockBuilder implements Closeable {
                 futureResultConsumer.accept(bError);
             }
         };
-        System.out.println("Scheduling next read");
         env.getRuntime().invokeMethodAsyncSequentially(iterator,
                 nextMethodName,
                 strandName,

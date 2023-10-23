@@ -35,6 +35,7 @@ public class BytesToXmlParser implements Parser {
     public void parse() throws Exception {
         while (xmlStreamReader.hasNext()) {
             int next = xmlStreamReader.next();
+            System.out.println("Parse XML: " + next);
             switch (next) {
                 case START_ELEMENT:
                     handleStartElement();

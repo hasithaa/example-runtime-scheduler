@@ -28,7 +28,7 @@ function runInefficientByteArrayStream(byte[] byteArray, typedesc<int|string> T)
 }
 
 function runEfficientByteArrayStream(stream<byte[], error?> byteStream, typedesc<int|string> T) returns error? {
-    io:println("Test Efficient Byte Array Stream for ", T);
+    io:println("Test Inefficient Byte Array Stream for ", T);
     int|string result = check readBytesStream(byteStream, T);
     io:println(result);
 }
