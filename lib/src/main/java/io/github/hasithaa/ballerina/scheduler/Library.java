@@ -40,6 +40,23 @@ public class Library {
         return null;
     }
 
+    public static Object readBytesStreamNew(Environment env, BStream stream, BTypedesc typedesc) {
+
+        final BObject iteratorObj = stream.getIteratorObj();
+        Future future = env.markAsync();
+        ByteBlockConsumer<Object> transformer = new ByteBlockConsumer<>(future, typedesc);
+        try (var byteBlockSteam = new BallerinaByteStream(env, iteratorObj, resolveNextMethod(iteratorObj),
+                transformer)) {
+            Parser parser = new BytesToXmlParser(byteBlockSteam);
+            byteBlockSteam.setParser(parser);
+            parser.parse();
+        } catch (Exception e) {
+            return ErrorCreator.createError(
+                    StringUtils.fromString("Error occurred while reading the stream: " + e.getMessage()));
+        }
+        return null;
+    }
+
     static MethodType resolveNextMethod(BObject iterator) {
         ObjectType objectType = (ObjectType) TypeUtils.getReferredType(iterator.getType());
         MethodType[] methods = objectType.getMethods();

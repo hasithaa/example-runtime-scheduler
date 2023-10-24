@@ -1,6 +1,6 @@
 import ballerina/io;
 
-const BUFFER_SIZE = 40;
+const BUFFER_SIZE = 50;
 
 class CustomByteSteam {
 
