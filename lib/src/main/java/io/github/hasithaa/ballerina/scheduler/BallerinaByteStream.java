@@ -35,8 +35,8 @@ public class BallerinaByteStream extends InputStream {
     private final StrandMetadata metadata;
     private final Map<String, Object> properties;
     private final Consumer<Object> futureResultConsumer;
-    private Parser parser;
     private AtomicInteger counter = new AtomicInteger(0);
+    AtomicBoolean done = new AtomicBoolean(false);
 
     public BallerinaByteStream(Environment env, BObject iterator, MethodType nextMethod,
             Consumer<Object> futureResultConsumer) {
@@ -50,12 +50,12 @@ public class BallerinaByteStream extends InputStream {
         this.futureResultConsumer = futureResultConsumer;
     }
 
-    public void setParser(Parser parser) {
-        this.parser = parser;
-    }
-
     @Override
     public int read() throws IOException {
+        if (done.get()) {
+            System.out.println("DONE");
+            return -1;
+        }
         if (hasBytesInCurrentChunk()) {
             return currentChunk[nextChunkIndex++];
         }
@@ -71,6 +71,7 @@ public class BallerinaByteStream extends InputStream {
             futureResultConsumer.accept(error);
             return -1;
         }
+        System.out.println("DONE2");
         return -1;
     }
 
@@ -80,7 +81,6 @@ public class BallerinaByteStream extends InputStream {
     }
 
     private boolean readNextChunk() throws InterruptedException {
-        AtomicBoolean done = new AtomicBoolean(false);
         Semaphore semaphore = new Semaphore(0);
         Callback callback = new Callback() {
             @Override
@@ -95,15 +95,15 @@ public class BallerinaByteStream extends InputStream {
             @Override
             public void notifySuccess(Object result) {
                 if (result == null) {
-                    System.out.println("XX-Reading Done");
+                    System.out.println("XX-Reading Done " + counter.get());
                     done.set(true);
-                    futureResultConsumer.accept(parser);
+                    // futureResultConsumer.accept(parser);
                     currentChunk = new byte[0];
                     semaphore.release();
                     return;
                 }
                 if (result instanceof BMap) {
-                    System.out.println("XX-Reading a chunk");
+                    System.out.println("XX-Reading a chunk " + counter.get());
                     BMap<BString, Object> valueRecord = (BMap<BString, Object>) result;
                     final BString value = Arrays.stream(valueRecord.getKeys()).findFirst().get();
                     final BArray arrayValue = valueRecord.getArrayValue(value);
@@ -112,7 +112,7 @@ public class BallerinaByteStream extends InputStream {
                     return;
                 } else {
                     // TODO : Investigate why this is happening.
-                    System.out.println("XX-Reading unknown");
+                    System.out.println("XX-Reading unknown " + counter.get());
                     System.out.println(result.toString());
                     done.set(true);
                     semaphore.release();

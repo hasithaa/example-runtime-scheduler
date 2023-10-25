@@ -48,8 +48,8 @@ public class Library {
         try (var byteBlockSteam = new BallerinaByteStream(env, iteratorObj, resolveNextMethod(iteratorObj),
                 transformer)) {
             Parser parser = new BytesToXmlParser(byteBlockSteam);
-            byteBlockSteam.setParser(parser);
             parser.parse();
+            transformer.accept(parser);
         } catch (Exception e) {
             return ErrorCreator.createError(
                     StringUtils.fromString("Error occurred while reading the stream: " + e.getMessage()));

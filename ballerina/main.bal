@@ -2,12 +2,17 @@ import ballerina/io;
 import ballerina/jballerina.java;
 
 public function main() returns error? {
-    check testLargeXML();
+    io:println(check testSmallXml() is string);
 }
 
-function testLargeXML() returns error? {
+function testSmallXml() returns string|error? {
+    stream<io:Block, io:Error?> data = check io:fileReadBlocksAsStream("small-data.xml");
+    return runEfficientByteArrayStream(data, string);
+}
+
+function testLargeXml() returns string|error? {
     stream<io:Block, io:Error?> data = check io:fileReadBlocksAsStream("large-data.xml");
-    check runEfficientByteArrayStream(data, string);
+    return runEfficientByteArrayStream(data, string);
 }
 
 function testSimple() returns error? {
@@ -31,45 +36,45 @@ function testSimple() returns error? {
     final byte[] byteArray = x.toString().toBytes();
 
     // Inefficient Byte Array
-    check runInefficientByteArray(byteArray, string);
+    _ = check runInefficientByteArray(byteArray, string);
 
     // Create Stream 1
     io:println("--- Create Stream 1 ---");
     stream<byte[], error?> byteStream1 = new (new CustomByteSteam(byteArray));
-    check runInefficientByteArrayStream(byteStream1, string);
+    _ = check runInefficientByteArrayStream(byteStream1, string);
 
     // Create Stream 1
     io:println("--- Create Stream  2---");
     stream<byte[], error?> byteStream2 = new (new CustomByteSteam(byteArray));
-    check runEfficientByteArrayStream(byteStream2, string);
+    _ = check runEfficientByteArrayStream(byteStream2, string);
 }
 
-function runInefficientByteArray(byte[] byteArray, typedesc<int|string> T) returns error? {
+isolated function runInefficientByteArray(byte[] byteArray, typedesc<string> T) returns string|error? {
     io:println("Test Inefficient Byte Array Stream for ", T);
-    string|int result = check readBytes(byteArray, T);
-    io:println(result);
+    string result = check readBytes(byteArray, T);
+    return result;
 }
 
-function runInefficientByteArrayStream(stream<byte[], error?> byteStream, typedesc<int|string> T) returns error? {
+isolated function runInefficientByteArrayStream(stream<byte[], error?> byteStream, typedesc<string> T) returns string|error? {
     io:println("Test Inefficient Byte Array Stream for ", T);
-    int|string result = check readBytesStream(byteStream, T);
-    io:println(result);
+    string result = check readBytesStream(byteStream, T);
+    return result;
 }
 
-function runEfficientByteArrayStream(stream<byte[], error?> byteStream, typedesc<int|string> T) returns error? {
+isolated function runEfficientByteArrayStream(stream<byte[], error?> byteStream, typedesc<string> T) returns string|error? {
     io:println("Test Efficient Byte Array Stream for ", T);
-    int|string result = check readBytesStreamNew(byteStream, T);
-    io:println(result is string);
+    string result = check readBytesStreamNew(byteStream, T);
+    return result;
 }
 
-function readBytes(byte[] bytes, typedesc<int|string> T = <>) returns T|error = @java:Method {
+isolated function readBytes(byte[] bytes, typedesc<int|string> T = <>) returns T|error = @java:Method {
     'class: "io.github.hasithaa.ballerina.scheduler.Library"
 } external;
 
-function readBytesStream(stream<byte[], error?> str, typedesc<int|string> T = <>) returns T|error = @java:Method {
+isolated function readBytesStream(stream<byte[], error?> str, typedesc<int|string> T = <>) returns T|error = @java:Method {
     'class: "io.github.hasithaa.ballerina.scheduler.Library"
 } external;
 
-function readBytesStreamNew(stream<byte[], error?> str, typedesc<int|string> T = <>) returns T|error = @java:Method {
+isolated function readBytesStreamNew(stream<byte[], error?> str, typedesc<int|string> T = <>) returns T|error = @java:Method {
     'class: "io.github.hasithaa.ballerina.scheduler.Library"
 } external;
