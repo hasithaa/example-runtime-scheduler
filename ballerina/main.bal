@@ -1,9 +1,29 @@
+import ballerina/http;
 import ballerina/io;
 import ballerina/jballerina.java;
 
-public function main() returns error? {
-    io:println(check testSmallXml() is string);
+service / on new http:Listener(9090) {
+
+    isolated resource function get method1() returns @http:Cache {noCache: true} string?|error {
+        byte[] fileReadBytes = check io:fileReadBytes("large-data.xml");
+        return runInefficientByteArray(fileReadBytes, string);
+    }
+
+    isolated resource function get method2() returns @http:Cache {noCache: true} string?|error {
+        stream<io:Block, io:Error?> data = check io:fileReadBlocksAsStream("large-data.xml");
+        return runInefficientByteArrayStream(data, string);
+    }
+
+    isolated resource function get method3() returns @http:Cache {noCache: true} string?|error {
+        stream<io:Block, io:Error?> data = check io:fileReadBlocksAsStream("large-data.xml");
+        return runEfficientByteArrayStream(data, string);
+    }
 }
+
+// public function main() returns error? {
+//     // io:println(check testLargeXml() is string);
+//     // _ = check io:fileReadXml("large-data.xml");
+// }
 
 function testSmallXml() returns string|error? {
     stream<io:Block, io:Error?> data = check io:fileReadBlocksAsStream("small-data.xml");
